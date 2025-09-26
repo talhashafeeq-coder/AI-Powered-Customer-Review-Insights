@@ -1,0 +1,521 @@
+/* Professional Dashboard Styles */
+
+.dashboard-container {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+}
+
+.metric-card {
+  transition: all 0.3s ease;
+  border: none;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.metric-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.metric-card .card-body {
+  padding: 2rem;
+}
+
+.metric-card h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.metric-card h6 {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin-bottom: 1rem;
+}
+
+.analytics-card {
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.analytics-card:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.analytics-card .card-header {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  border-radius: 15px 15px 0 0 !important;
+  border: none;
+  padding: 1.5rem;
+}
+
+.analytics-card .card-header h5 {
+  margin: 0;
+  font-weight: 600;
+}
+
+.insight-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  color: white;
+}
+
+.insight-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.insight-card h6 {
+  color: white !important;
+  font-weight: 600;
+}
+
+.insight-card .badge {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.status-badge {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+  }
+}
+
+.progress-custom {
+  height: 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.progress-custom .progress-bar {
+  border-radius: 10px;
+}
+
+.table-professional {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.table-professional thead {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.table-professional thead th {
+  border: none;
+  color: white;
+  font-weight: 600;
+  padding: 1rem 0.75rem;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.table-professional tbody tr {
+  transition: all 0.3s ease;
+}
+
+.table-professional tbody tr:hover {
+  background-color: rgba(102, 126, 234, 0.1);
+  transform: scale(1.01);
+}
+
+.table-professional tbody td {
+  padding: 0.75rem;
+  vertical-align: middle;
+  border-top: 1px solid #dee2e6;
+}
+
+/* Enhanced table features */
+.text-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.expandable-row {
+  background-color: #f8f9fa;
+  border-top: 2px solid #667eea;
+}
+
+.collapse-content {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px;
+  margin: 0.5rem;
+}
+
+/* Badge improvements */
+.badge-custom {
+  font-size: 0.75rem;
+  padding: 0.35em 0.65em;
+  border-radius: 0.375rem;
+  font-weight: 500;
+}
+
+/* Tooltip styling */
+.tooltip {
+  font-size: 0.875rem;
+}
+
+.tooltip-inner {
+  background-color: #2c3e50;
+  color: white;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  max-width: 300px;
+}
+
+.badge-custom {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.navbar-professional {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+.header-professional {
+  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%) !important;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+.chart-container {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Chart improvements */
+.recharts-pie-label-text {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  fill: #333 !important;
+}
+
+.recharts-legend-item-text {
+  font-size: 12px !important;
+  color: #333 !important;
+}
+
+.recharts-tooltip-wrapper {
+  outline: none !important;
+}
+
+.recharts-cartesian-axis-tick-value {
+  font-size: 11px !important;
+}
+
+/* Chart improvements for better readability */
+.recharts-xAxis .recharts-text {
+  font-size: 10px !important;
+  fill: #666 !important;
+}
+
+.recharts-yAxis .recharts-text {
+  font-size: 11px !important;
+  fill: #666 !important;
+}
+
+.recharts-bar-rectangle {
+  transition: all 0.3s ease;
+}
+
+.recharts-bar-rectangle:hover {
+  opacity: 0.8;
+  filter: brightness(1.1);
+}
+
+/* Responsive chart adjustments */
+@media (max-width: 768px) {
+  .recharts-xAxis .recharts-text {
+    font-size: 9px !important;
+  }
+  
+  .recharts-yAxis .recharts-text {
+    font-size: 10px !important;
+  }
+}
+
+/* Filter Sidebar Styles */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.filter-item {
+  transition: all 0.3s ease;
+}
+
+.filter-item:hover {
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filter-item.active {
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* Reviews and Insights Page Styles */
+.reviews-container,
+.insights-container {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.review-item,
+.insight-item {
+  transition: all 0.3s ease;
+}
+
+.review-item:hover,
+.insight-item:hover {
+  background-color: rgba(102, 126, 234, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.insight-details {
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+/* Add Review Page Styles */
+.rating-selection {
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 8px;
+  background: #f8f9fa;
+}
+
+.rating-option {
+  transition: all 0.3s ease;
+}
+
+.rating-option:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.rating-option.selected {
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* Form Enhancements */
+.form-control-lg {
+  border-radius: 12px !important;
+  border: 2px solid #e9ecef !important;
+  transition: all 0.3s ease;
+}
+
+.form-control-lg:focus {
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+}
+
+.form-select {
+  border-radius: 12px !important;
+  border: 2px solid #e9ecef !important;
+  transition: all 0.3s ease;
+}
+
+.form-select:focus {
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+}
+
+/* Enhanced Badge Styles */
+.badge-custom {
+  font-size: 0.75rem;
+  padding: 0.5em 0.75em;
+  border-radius: 20px;
+  font-weight: 500;
+  border: none;
+}
+
+/* Loading States */
+.loading-spinner {
+  color: #667eea;
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem !important;
+  }
+  
+  .analytics-card .card-body {
+    padding: 1rem !important;
+  }
+  
+  .filter-item {
+    font-size: 0.85rem;
+    padding: 6px 10px;
+  }
+  
+  .rating-option {
+    padding: 10px 12px;
+  }
+  
+  .action-button {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Animation for new content */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.data-update {
+  animation: slideInUp 0.5s ease-out;
+}
+
+/* Enhanced scrollbar for containers */
+.reviews-container::-webkit-scrollbar,
+.insights-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.reviews-container::-webkit-scrollbar-track,
+.insights-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.reviews-container::-webkit-scrollbar-thumb,
+.insights-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10px;
+}
+
+.reviews-container::-webkit-scrollbar-thumb:hover,
+.insights-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+.action-button {
+  border-radius: 25px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.loading-spinner {
+  color: #667eea;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #6c757d;
+}
+
+.empty-state i {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .metric-card h2 {
+    font-size: 2rem;
+  }
+  
+  .analytics-card .card-header {
+    padding: 1rem;
+  }
+  
+  .table-professional {
+    font-size: 0.9rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .dashboard-container {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  }
+  
+  .analytics-card {
+    background: #34495e;
+    color: white;
+  }
+  
+  .chart-container {
+    background: #34495e;
+    color: white;
+  }
+}
+
+/* Animation for new data */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.data-update {
+  animation: slideInUp 0.5s ease-out;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
