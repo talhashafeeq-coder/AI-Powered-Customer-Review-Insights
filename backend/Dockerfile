@@ -30,12 +30,25 @@ RUN mkdir -p static
 # Expose port
 EXPOSE 8000
 
-# Health check
+# Health check (use Python stdlib instead of curl)
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/api/health || exit 1
+    CMD python -c "import sys,urllib.request;\
+try:\
+    urllib.request.urlopen('http://localhost:8000/api/health', timeout=5);\
+    sys.exit(0)\
+except Exception as e:\
+    sys.exit(1)"
 
 # Run the application
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+
+
+
+
+
+
+
 
 
 

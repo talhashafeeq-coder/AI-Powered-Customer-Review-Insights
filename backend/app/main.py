@@ -23,7 +23,8 @@ app = FastAPI(
     description="Extract actionable insights from customer reviews using AI",
     version="1.0.0",
     docs_url="/api/docs",
-    redoc_url="/api/redoc"
+    redoc_url="/api/redoc",
+    openapi_url="/api/openapi.json"
 )
 
 # CORS middleware

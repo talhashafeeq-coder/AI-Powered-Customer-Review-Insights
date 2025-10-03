@@ -59,7 +59,8 @@ class Insight(InsightBase):
     model_config = ConfigDict(
         populate_by_name=True,
         arbitrary_types_allowed=True,
-        json_encoders={datetime: lambda v: v.isoformat()}
+        json_encoders={datetime: lambda v: v.isoformat()},
+        protected_namespaces=()  # Allow underscore fields
     )
 
 
