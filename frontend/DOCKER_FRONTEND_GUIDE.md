@@ -53,3 +53,16 @@ The root `docker-compose.yml` includes a `frontend` service that depends on `bac
 - For production behind a reverse proxy, adapt Nginx caching headers as needed in `nginx.conf`.
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+

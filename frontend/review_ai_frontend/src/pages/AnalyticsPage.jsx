@@ -9,9 +9,9 @@ import {
   Spinner,
   ProgressBar,
 } from "react-bootstrap"; // import Bootstrap components
-import axios from "axios"; // for API calls
 import CountUp from "react-countup"; // for animated counting
 import "../components/Dashboard.css"; // import custom CSS
+import { fetchStats, fetchReviews, batchAnalyzeReviews, testAPI } from "../services/api";
 
 export default function AnalyticsPage() {
   const [stats, setStats] = useState({
@@ -26,12 +26,12 @@ export default function AnalyticsPage() {
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
-      const [statsRes, reviewsRes] = await Promise.all([
-        axios.get("http://localhost:8000/api/analytics/summary"),
-        axios.get("http://localhost:8000/api/reviews"),
+      const [statsData, reviewsData] = await Promise.all([
+        fetchStats(),
+        fetchReviews(),
       ]);
-      setStats(statsRes.data);
-      setReviews(reviewsRes.data);
+      setStats(statsData);
+      setReviews(reviewsData);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -52,37 +52,37 @@ export default function AnalyticsPage() {
         return;
       }
 
-      const res = await axios.post(
-        "http://localhost:8000/api/insights/batch-analyze",
-        { review_ids: pendingReviews.map((r) => r.id), force_reanalysis: false }
+      const res = await batchAnalyzeReviews(
+        pendingReviews.map((r) => r.id), 
+        false
       );
 
-      alert(res.data.message || "Batch analysis started successfully!");
+      alert(res.message || "Batch analysis started successfully!");
       fetchAnalytics();
     } catch (err) {
       alert("Error: " + err.message);
     }
   };
 
-  const handleSingleAnalyze = async (reviewId) => {
-    try {
-      const res = await axios.post(
-        "http://localhost:8000/api/insights/batch-analyze",
-        { review_ids: [reviewId], force_reanalysis: true }
-      );
-      alert(
-        res.data.message ||
-          `AI NRI triggered for Review ${reviewId}. Success: ${res.data.successful_analyses}, Failed: ${res.data.failed_analyses}`
-      );
-      fetchAnalytics();
-    } catch (err) {
-      alert(
-        `Error triggering AI NRI for Review ${reviewId}: ${
-          err.response?.data?.detail || err.message
-        }`
-      );
+const handleSingleAnalyze = async (reviewId) => {
+  try {
+    const res = await batchAnalyzeReviews([reviewId], true);
+
+    if (res.successful_analyses > 0) {
+      alert(`✅ Action successful for Review `);
+    } else {
+      alert(`⚠️ Action failed for Review 🙌🏼`);
     }
-  };
+
+    fetchAnalytics();
+  } catch (err) {
+    alert(
+      `❌ Error while processing Review ${reviewId}: ${
+        err.response?.data?.detail || err.message
+      }`
+    );
+  }
+};
 
   if (loading)
     return (
@@ -230,10 +230,8 @@ export default function AnalyticsPage() {
               variant="outline-primary"
               onClick={async () => {
                 try {
-                  const res = await axios.get(
-                    "http://localhost:8000/api/health"
-                  );
-                  alert("API Status: " + res.data.status);
+                  const res = await testAPI();
+                  alert("API Status: " + res.status);
                 } catch (err) {
                   alert("API Error: " + err.message);
                 }

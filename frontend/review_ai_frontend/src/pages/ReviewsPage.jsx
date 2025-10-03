@@ -23,6 +23,8 @@ export default function ReviewsPage() {
   const [selectedRating, setSelectedRating] = useState("All");
   const [selectedAnalysis, setSelectedAnalysis] = useState("All");
   const [sortBy, setSortBy] = useState("date");
+  const [expandedReviewId, setExpandedReviewId] = useState(null); // show full review text
+
 
   useEffect(() => {
     const loadReviews = async () => {
@@ -281,20 +283,31 @@ export default function ReviewsPage() {
                             </p>
                           </div>
 
-                          <div className="mt-3 d-flex justify-content-between align-items-center">
-                            <div className="text-muted small">
-                              <i className="fas fa-id-card me-1"></i>
-                              ID: {review.id || 'N/A'}
-                            </div>
-                            <Button 
-                              size="sm" 
-                              variant="outline-primary"
-                              className="action-button"
-                            >
-                              <i className="fas fa-eye me-1"></i>
-                              View Details
-                            </Button>
-                          </div>
+                        <div className="mt-3 d-flex justify-content-between align-items-center">
+  <div className="text-muted small">
+    <i className="fas fa-id-card me-1"></i>
+  </div>
+  <Button
+    size="sm"
+    variant="outline-primary"
+    className="action-button"
+    onClick={() => setExpandedReviewId(expandedReviewId === (review.id || idx) ? null : (review.id || idx))}
+  >
+    <i className="fas fa-eye me-1"></i>
+    {expandedReviewId === (review.id || idx) ? "Hide Details" : "View Details"}
+  </Button>
+</div>
+
+{/* Expandable Content */}
+{expandedReviewId === (review.id || idx) && (
+  <div className="mt-3 p-3 bg-dark rounded">
+    <p><strong>Review ID:</strong> {review.id || "N/A"}</p>
+    <p><strong>Source:</strong> {review.source}</p>
+    <p><strong>Full Text:</strong> {review.text}</p>
+    <p><strong>Status:</strong> {review.is_analyzed ? "Analyzed ✅" : "Pending ⏳"}</p>
+  </div>
+)}
+
                         </div>
                       ))}
                     </div>

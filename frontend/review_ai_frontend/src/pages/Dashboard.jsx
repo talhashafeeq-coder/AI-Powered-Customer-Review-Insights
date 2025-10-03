@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { 
   Container, 
   Row, 
@@ -58,6 +58,11 @@ export default function Dashboard() {
   const [timeRange, setTimeRange] = useState('7d');
   const [refreshInterval, setRefreshInterval] = useState(null);
   const [expandedRows, setExpandedRows] = useState({});
+  // Pagination and filter states for Actionable Insights
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(6); // Show 6 insights per page (2 rows of 3)
+  const [filteredSuggestions, setFilteredSuggestions] = useState([]);
+  const [selectedFilter, setSelectedFilter] = useState('all'); // all, positive, negative, neutral
 
   const COLORS = {
     positive: "#28a745",
@@ -131,44 +136,91 @@ export default function Dashboard() {
     ? (stats.analyzed_reviews / stats.total_reviews) * 100 
     : 0;
 
-  // Prepare data for visualizations
-  const problemCounts = {};
-  const suggestionCounts = {};
-  const topicCounts = {};
-  const sentimentTrends = [];
+  // Memoize data processing to prevent infinite loops
+  const { topSuggestions, topProblems, topTopics } = useMemo(() => {
+    const problemCounts = {};
+    const suggestionCounts = {};
+    const topicCounts = {};
 
-  stats.insights.forEach(insight => {
-    // Problems
-    insight.problems?.forEach(problem => {
-      problemCounts[problem] = (problemCounts[problem] || 0) + 1;
+    stats.insights.forEach(insight => {
+      // Problems
+      insight.problems?.forEach(problem => {
+        problemCounts[problem] = (problemCounts[problem] || 0) + 1;
+      });
+      
+      // Suggestions
+      insight.suggestions?.forEach(suggestion => {
+        suggestionCounts[suggestion] = (suggestionCounts[suggestion] || 0) + 1;
+      });
+      
+      // Topics
+      insight.topics?.forEach(topic => {
+        topicCounts[topic] = (topicCounts[topic] || 0) + 1;
+      });
     });
+
+    // Sort and limit data for better visualization
+    const topProblems = Object.entries(problemCounts)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 8)
+      .map(([problem, count]) => ({ problem, count }));
+
+    const topTopics = Object.entries(topicCounts)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 8)
+      .map(([topic, count]) => ({ topic, count }));
+
+    const topSuggestions = Object.entries(suggestionCounts)
+      .sort(([,a], [,b]) => b - a)
+      .map(([suggestion, count]) => ({ suggestion, count }));
+
+    return { topSuggestions, topProblems, topTopics };
+  }, [stats.insights]);
+
+  // Filter suggestions based on sentiment
+  useEffect(() => {
+    let filtered = topSuggestions;
     
-    // Suggestions
-    insight.suggestions?.forEach(suggestion => {
-      suggestionCounts[suggestion] = (suggestionCounts[suggestion] || 0) + 1;
-    });
+    if (selectedFilter !== 'all') {
+      // Filter insights by sentiment and then get suggestions from those insights
+      const filteredInsights = stats.insights.filter(insight => insight.sentiment === selectedFilter);
+      const filteredSuggestionCounts = {};
+      
+      filteredInsights.forEach(insight => {
+        insight.suggestions?.forEach(suggestion => {
+          filteredSuggestionCounts[suggestion] = (filteredSuggestionCounts[suggestion] || 0) + 1;
+        });
+      });
+      
+      filtered = Object.entries(filteredSuggestionCounts)
+        .sort(([,a], [,b]) => b - a)
+        .map(([suggestion, count]) => ({ suggestion, count }));
+    }
     
-    // Topics
-    insight.topics?.forEach(topic => {
-      topicCounts[topic] = (topicCounts[topic] || 0) + 1;
-    });
-  });
+    setFilteredSuggestions(filtered);
+    setCurrentPage(1); // Reset to first page when filter changes
+  }, [selectedFilter, stats.insights, topSuggestions]);
 
-  // Sort and limit data for better visualization
-  const topProblems = Object.entries(problemCounts)
-    .sort(([,a], [,b]) => b - a)
-    .slice(0, 8)
-    .map(([problem, count]) => ({ problem, count }));
+  // Memoize pagination calculations
+  const paginationData = useMemo(() => {
+    const totalPages = Math.ceil(filteredSuggestions.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentSuggestions = filteredSuggestions.slice(startIndex, endIndex);
+    
+    return { totalPages, startIndex, endIndex, currentSuggestions };
+  }, [filteredSuggestions, currentPage, itemsPerPage]);
 
-  const topTopics = Object.entries(topicCounts)
-    .sort(([,a], [,b]) => b - a)
-    .slice(0, 8)
-    .map(([topic, count]) => ({ topic, count }));
+  const { totalPages, startIndex, endIndex, currentSuggestions } = paginationData;
 
-  const topSuggestions = Object.entries(suggestionCounts)
-    .sort(([,a], [,b]) => b - a)
-    .slice(0, 6)
-    .map(([suggestion, count]) => ({ suggestion, count }));
+  // Memoize pagination handlers
+  const handlePageChange = useCallback((page) => {
+    setCurrentPage(page);
+  }, []);
+
+  const handleFilterChange = useCallback((filter) => {
+    setSelectedFilter(filter);
+  }, []);
 
   // Get sentiment distribution
   const sentimentData = sentiment?.sentiment_breakdown?.map(item => ({
@@ -199,7 +251,7 @@ export default function Dashboard() {
           <Col>
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                <h2 className="mb-1 text-light">📊 Analytics Dashboard</h2>
+                <h2 className="mb-1  text-light">📊 Analytics Dashboard</h2>
                 <p className="text-light  mb-0">Real-time insights from customer reviews</p>
               </div>
               <div className="d-flex gap-2">
@@ -404,42 +456,119 @@ export default function Dashboard() {
               <Card.Header>
                 <div className="d-flex justify-content-between align-items-center">
                   <h5 className="mb-0">💡 Actionable Insights</h5>
-                  <ButtonGroup size="sm">
-                    <Button 
-                      className="action-button"
-                      variant={showFilters ? "primary" : "outline-primary"}
-                      onClick={() => setShowFilters(!showFilters)}
-                    >
-                      🔍 Filters
-                    </Button>
-                    <Button 
-                      className="action-button"
-                      variant={showTable ? "danger" : "outline-secondary"}
-                      onClick={() => setShowTable(!showTable)}
-                    >
-                      {showTable ? "Hide Table" : "Show Table"}
-                    </Button>
-                  </ButtonGroup>
+                  <div className="d-flex gap-2">
+                    <Dropdown>
+                      <Dropdown.Toggle variant="outline-info" size="sm">
+                        🎯 Filter by Sentiment
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        <Dropdown.Item onClick={() => handleFilterChange('all')}>
+                          All Sentiments ({topSuggestions.length})
+                        </Dropdown.Item>
+                        <Dropdown.Divider />
+                        <Dropdown.Item onClick={() => handleFilterChange('positive')}>
+                          😊 Positive ({stats.insights.filter(i => i.sentiment === 'positive').length})
+                        </Dropdown.Item>
+                        <Dropdown.Item onClick={() => handleFilterChange('negative')}>
+                          😞 Negative ({stats.insights.filter(i => i.sentiment === 'negative').length})
+                        </Dropdown.Item>
+                        <Dropdown.Item onClick={() => handleFilterChange('neutral')}>
+                          😐 Neutral ({stats.insights.filter(i => i.sentiment === 'neutral').length})
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                    <ButtonGroup size="sm">
+                      <Button 
+                        className="action-button"
+                        variant={showFilters ? "primary" : "outline-primary"}
+                        onClick={() => setShowFilters(!showFilters)}
+                      >
+                        🔍 Filters
+                      </Button>
+                      <Button 
+                        className="action-button"
+                        variant={showTable ? "danger" : "outline-secondary"}
+                        onClick={() => setShowTable(!showTable)}
+                      >
+                        {showTable ? "Hide Table" : "Show Table"}
+                      </Button>
+                    </ButtonGroup>
+                  </div>
                 </div>
               </Card.Header>
               <Card.Body className="p-4">
-                {topSuggestions.length > 0 ? (
-                  <Row className="g-3">
-                    {topSuggestions.map((item, idx) => (
-                      <Col md={4} key={idx}>
-                        <div className="insight-card p-3">
-                          <h6 className="mb-2 text-white">
-                            💡 {item.suggestion}
-                          </h6>
-                          <Badge bg="light" text="dark" className="badge-custom">{item.count} mentions</Badge>
-                        </div>
-                      </Col>
-                    ))}
-                  </Row>
+                {/* Filter Status */}
+                <div className="mb-3">
+                  <small className="text-muted">
+                    Showing {currentSuggestions.length} of {filteredSuggestions.length} insights
+                    {selectedFilter !== 'all' && ` (filtered by ${selectedFilter} sentiment)`}
+                  </small>
+                </div>
+
+                {currentSuggestions.length > 0 ? (
+                  <>
+                    <Row className="g-3">
+                      {currentSuggestions.map((item, idx) => (
+                        <Col md={4} key={startIndex + idx}>
+                          <div className="insight-card p-3">
+                            <h6 className="mb-2 text-white">
+                              💡 {item.suggestion}
+                            </h6>
+                            <Badge bg="light" text="dark" className="badge-custom">{item.count} mentions</Badge>
+                          </div>
+                        </Col>
+                      ))}
+                    </Row>
+                    
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                      <div className="d-flex justify-content-center mt-4">
+                        <nav>
+                          <ul className="pagination pagination-sm">
+                            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                              <button 
+                                className="page-link" 
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                disabled={currentPage === 1}
+                              >
+                                Previous
+                              </button>
+                            </li>
+                            
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                              <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
+                                <button 
+                                  className="page-link" 
+                                  onClick={() => handlePageChange(page)}
+                                >
+                                  {page}
+                                </button>
+                              </li>
+                            ))}
+                            
+                            <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                              <button 
+                                className="page-link" 
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={currentPage === totalPages}
+                              >
+                                Next
+                              </button>
+                            </li>
+                          </ul>
+                        </nav>
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <div className="empty-state">
                     <i className="fas fa-lightbulb"></i>
-                    <p>No suggestions available yet</p>
+                    <p>
+                      {selectedFilter !== 'all' 
+                        ? `No ${selectedFilter} sentiment insights available` 
+                        : 'No suggestions available yet'
+                      }
+                    </p>
                   </div>
                 )}
                 </Card.Body>

@@ -16,7 +16,7 @@ export default function Home() {
         <Card className="p-3 mt-4">
           <h4>📘 API Documentation</h4>
           <iframe
-            src="http://localhost:8000/api/docs"
+            src="/api/docs"
             title="API Docs"
             style={{ width: "100%", height: "80vh", border: "none" }}
           />

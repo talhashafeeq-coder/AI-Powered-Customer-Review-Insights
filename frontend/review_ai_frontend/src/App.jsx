@@ -14,7 +14,7 @@ export default function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/reviews" element={<ReviewsPage />} />
-        <Route path="/Analytics" element={<Analytics/>} />"
+        <Route path="/Analytics" element={<Analytics/>} />
         <Route path="/insights" element={<InsightsPage />} />
         <Route path="/add-review" element={<AddReviewPage />} />
         <Route path="*" element={<Navigate to="/" />} />

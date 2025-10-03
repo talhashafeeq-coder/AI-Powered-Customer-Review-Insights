@@ -74,3 +74,16 @@ Note: One minor nit in `App.jsx` route path casing for `/Analytics` (capital A) 
 Frontend is in solid shape: consistent design system, accessible filters in sidebars, good chart/table UX, and clean API integration. A few minor polish items are noted above.
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+

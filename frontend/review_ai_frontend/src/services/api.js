@@ -1,8 +1,7 @@
 import axios from "axios";
 
-// const API_BASE = "http://localhost:8000/api";
-// Use env when provided; otherwise rely on Nginx proxy at /api
-const API_BASE = import.meta.env?.VITE_API_BASE || "/api";
+// Force use of Nginx proxy at /api for Docker deployment
+const API_BASE = "/api";
 
 // Analytics / Health
 export const fetchStats = async () => {
@@ -22,17 +21,17 @@ export const testAPI = async () => {
 
 // Reviews
 export const createSampleReview = async (review) => {
-  const res = await axios.post(`${API_BASE}/reviews`, review);
+  const res = await axios.post(`${API_BASE}/reviews/`, review);
   return res.data;
 };
 
 export const fetchReviews = async () => {
-  const res = await axios.get(`${API_BASE}/reviews`);
+  const res = await axios.get(`${API_BASE}/reviews/`);
   return Array.isArray(res.data) ? res.data : res.data.reviews || [];
 };
 
 export const addReview = async (review) => {
-  const res = await axios.post(`${API_BASE}/reviews`, review);
+  const res = await axios.post(`${API_BASE}/reviews/`, review);
   return res.data;
 };
 
@@ -91,8 +90,8 @@ export const fetchEnhancedStats = async () => {
   try {
     const [statsRes, reviewsRes, insightsRes] = await Promise.all([
       axios.get(`${API_BASE}/analytics/summary`),
-      axios.get(`${API_BASE}/reviews?limit=5`),
-      axios.get(`${API_BASE}/insights?limit=10`)
+      axios.get(`${API_BASE}/reviews/?limit=5`),
+      axios.get(`${API_BASE}/insights/?limit=10`)
     ]);
     
     return {
