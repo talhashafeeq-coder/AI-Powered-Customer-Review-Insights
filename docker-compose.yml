@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # Single container with all services (MongoDB, Backend, Frontend)
+  review-insights:
+    image: talhashafiq/review_insights:v2
+    container_name: review_insights_app
+    restart: unless-stopped
+    ports:
+      - "8080:80"      # Frontend (Nginx)
+      - "8001:8000"    # Backend API
+      - "27017:27017"  # MongoDB
+    environment:
+      # Groq AI Configuration (REQUIRED - User must provide)
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      GROQ_MODEL: ${GROQ_MODEL:-llama-3.1-8b-instant}
+      
+      # MongoDB Configuration
+      MONGODB_URL: mongodb://localhost:27017
+      DATABASE_NAME: ${DATABASE_NAME:-review_insights}
+      
+      # Application Configuration
+      DEBUG: ${DEBUG:-False}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-["*"]}
+      MAX_REQUESTS_PER_MINUTE: ${MAX_REQUESTS_PER_MINUTE:-60}
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - review_insights_network
+
+volumes:
+  mongodb_data:
+
+networks:
+  review_insights_network:
+    driver: bridge

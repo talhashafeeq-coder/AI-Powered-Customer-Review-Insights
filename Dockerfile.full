@@ -1,0 +1,92 @@
+# Multi-service single-container image: frontend (nginx), backend (uvicorn), MongoDB (mongod)
+# Base: Ubuntu for apt packages (mongodb, nginx, supervisor) and Node for building frontend
+
+FROM ubuntu:22.04 AS base
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates curl gnupg lsb-release software-properties-common \
+    nginx supervisor \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python 3.11
+RUN add-apt-repository -y ppa:deadsnakes/ppa \
+    && apt-get update && apt-get install -y --no-install-recommends \
+       python3.11 python3.11-venv python3.11-distutils \
+    && curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
+
+# Install MongoDB (official repo)
+RUN curl -fsSL https://pgp.mongodb.com/server-6.0.asc | gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg \
+    && echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/6.0 multiverse" \
+    | tee /etc/apt/sources.list.d/mongodb-org-6.0.list \
+    && apt-get update && apt-get install -y --no-install-recommends mongodb-org \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node for building the frontend
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get update && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# -----------------------------
+# Backend setup
+# -----------------------------
+COPY backend/requirements.txt /app/backend/requirements.txt
+RUN python3.11 -m venv /app/venv \
+    && . /app/venv/bin/activate \
+    && pip install --upgrade pip \
+    && pip install -r /app/backend/requirements.txt
+
+COPY backend /app/backend
+
+# -----------------------------
+# Frontend build
+# -----------------------------
+WORKDIR /app/frontend
+COPY frontend/review_ai_frontend/package*.json ./
+RUN npm ci
+COPY frontend/review_ai_frontend .
+RUN npm run build
+
+# Move built assets to nginx html
+RUN rm -rf /usr/share/nginx/html/* \
+    && cp -r dist/* /usr/share/nginx/html/
+
+# -----------------------------
+# Nginx and Supervisor configs
+# -----------------------------
+WORKDIR /app
+COPY frontend/review_ai_frontend/nginx.conf /etc/nginx/nginx.conf.orig
+COPY nginx.single.conf /etc/nginx/conf.d/default.conf
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Remove default site so our config takes precedence
+RUN rm -f /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default || true
+
+# -----------------------------
+# MongoDB data directory
+# -----------------------------
+RUN mkdir -p /data/db /var/log/mongodb /var/log/backend /var/log/nginx \
+    && chown -R root:root /data/db /var/log/mongodb /var/log/backend /var/log/nginx
+
+# -----------------------------
+# Environment defaults
+# -----------------------------
+ENV MONGODB_URL=mongodb://localhost:27017 \
+    DATABASE_NAME=review_insights \
+    GROQ_MODEL=llama-3.1-8b-instant \
+    GROQ_API_KEY=
+
+# Expose ports: 80 (nginx), 8000 (backend), 27017 (mongodb)
+EXPOSE 80 8000 27017
+
+WORKDIR /app
+
+# Entrypoint: run supervisord to manage all services
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+
+

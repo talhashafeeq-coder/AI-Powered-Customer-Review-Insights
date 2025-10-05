@@ -1,4 +1,2 @@
-# Backend-specific files to ignore
+.env
 dashboard.html
-
-# Note: .env files are already handled by the main .gitignore file
